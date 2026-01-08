@@ -15,8 +15,6 @@ O **Uniautos** é um sistema web leve e seguro desenvolvido para o controle fina
 
 O sistema possui uma **camada de proteção de entrada**. Ao acessar o link, a interface de gestão fica oculta, exigindo uma senha mestra para liberar o acesso. Isso garante que apenas pessoas autorizadas visualizem as finanças da oficina.
 
-- **Senha Padrão**: `uniautos2026`
-
 ## 📊 Exportação de Dados
 
 O Uniautos permite a exportação de todos os registros para uma planilha **Excel (.xlsx)** com apenas um clique, facilitando a contabilidade mensal e o backup de informações.
