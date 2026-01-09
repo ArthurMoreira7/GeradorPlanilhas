@@ -4,7 +4,7 @@ function App() {
   // --- CONFIGURAÇÃO DE ACESSO ---
   const [autorizado, setAutorizado] = useState(false);
   const [senhaDigitada, setSenhaDigitada] = useState("");
-  const SENHA_DE_ACESSO = "uniautos2026"; // Altere aqui para a senha que desejar
+  const SENHA_DE_ACESSO = "uniautos2026";
 
   // Limites de 2026
   const hoje = new Date().toISOString().split("T")[0];
@@ -14,12 +14,14 @@ function App() {
   // Estados de dados
   const [registros, setRegistros] = useState(() => {
     const salvos = JSON.parse(localStorage.getItem("uniautos_db_v5")) || [];
+    // Filtra para garantir que apenas 2026 apareça
     return salvos.filter((r) => r.data >= inicioAno && r.data <= fimAno);
   });
 
   const [sugestoes, setSugestoes] = useState(
     JSON.parse(localStorage.getItem("uniautos_sugestoes")) || []
   );
+
   const [formData, setFormData] = useState({
     data: hoje,
     desc: "",
@@ -28,6 +30,7 @@ function App() {
     pagamento: "PIX",
   });
 
+  // Salvar dados sempre que houver alteração
   useEffect(() => {
     if (autorizado) {
       localStorage.setItem("uniautos_db_v5", JSON.stringify(registros));
@@ -48,7 +51,33 @@ function App() {
     }
   };
 
-  // 1. TELA DE BLOQUEIO (Só exibe isso se não estiver autorizado)
+  // FUNÇÃO PARA GERAR PLANILHA (Excel)
+  const exportarParaExcel = () => {
+    try {
+      if (registros.length === 0) {
+        alert("Não há dados para exportar.");
+        return;
+      }
+      const ws = XLSX.utils.json_to_sheet(
+        registros.map((r) => ({
+          Data: new Date(r.data).toLocaleDateString("pt-BR", {
+            timeZone: "UTC",
+          }),
+          Descrição: r.desc,
+          Valor: r.valor,
+          Categoria: r.tipo.toUpperCase(),
+          Pagamento: r.pagamento,
+        }))
+      );
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Financeiro");
+      XLSX.writeFile(wb, "Uniautos_Relatorio_2026.xlsx");
+    } catch (error) {
+      alert("Erro ao gerar planilha. Verifique a conexão.");
+    }
+  };
+
+  // 1. TELA DE BLOQUEIO (Segurança de Entrada)
   if (!autorizado) {
     return (
       <div
@@ -103,7 +132,7 @@ function App() {
     );
   }
 
-  // 2. SISTEMA DA OFICINA (Só existe visualmente após a senha)
+  // LÓGICA DO SISTEMA APÓS SENHA
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.data < inicioAno || formData.data > fimAno) {
@@ -126,6 +155,7 @@ function App() {
 
   const formatMoeda = (v) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
   const totalRec = registros
     .filter((r) => r.tipo === "receita")
     .reduce((a, b) => a + b.valor, 0);
@@ -142,6 +172,7 @@ function App() {
           <i className="fas fa-calendar-check"></i> GESTÃO FINANCEIRA ATUAL
         </p>
       </header>
+
       <main className="container">
         <section className="dashboard">
           <div className="card card-receita">
@@ -161,7 +192,16 @@ function App() {
             <p>{formatMoeda(totalDesp)}</p>
           </div>
         </section>
+
         <section className="box-panel">
+          <div className="panel-header">
+            <h3>Lançamento de Caixa</h3>
+            {/* BOTÃO DE EXCEL REATIVADO */}
+            <button onClick={exportarParaExcel} className="btn-excel">
+              <i className="fas fa-file-excel"></i> Gerar Planilha
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit}>
             <div className="input-group">
               <label>Data</label>
@@ -236,6 +276,7 @@ function App() {
             </button>
           </form>
         </section>
+
         <div className="table-wrapper">
           <table>
             <thead>
