@@ -26,8 +26,3 @@ O Uniautos permite a exportação de todos os registros para uma planilha **Exce
 - **SheetJS**: Para a geração de relatórios em Excel.
 - **CSS3**: Layout moderno nas cores Laranja e Cinza Escuro (Padrão Oficina).
 
-## 📂 Como instalar
-
-1. Clone este repositório:
-   ```bash
-   git clone [https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git](https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git)
